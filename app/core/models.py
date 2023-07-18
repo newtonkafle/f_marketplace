@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 class UserManger(BaseUserManager):
 
-    def create_user(self, first_name, last_name, username, email, password=None):
+    def create_user(self, first_name, last_name, username, email, phone_number, password=None):
         if not email:
             raise ValueError('User must have an email')
         if not username:
@@ -17,6 +17,7 @@ class UserManger(BaseUserManager):
             username=username,
             first_name=first_name,
             last_name=last_name,
+            phone_number=phone_number,
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -103,15 +104,15 @@ class UserProfile(models.Model):
         return self.user.email
 
 
-@receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
-    """create a profile of user using django signal post_save """
-    try:
-        profile = UserProfile.objects.get(user=instance)
-    except UserProfile.DoesNotExist:
-        UserProfile.objects.create(user=instance)
-    else:
-        profile.save()
+# @receiver(post_save, sender=User)
+# def create_profile(sender, instance, created, **kwargs):
+#     """create a profile of user using django signal post_save """
+#     try:
+#         profile = UserProfile.objects.get(user=instance)
+#     except UserProfile.DoesNotExist:
+#         UserProfile.objects.create(user=instance)
+#     else:
+#         profile.save()
 
 
-# post_save.connect(create_profile, sender=User)
+# # post_save.connect(create_profile, sender=User)
