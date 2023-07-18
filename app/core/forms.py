@@ -1,5 +1,5 @@
 from django import forms
-from core.models import User
+from core.models import User, Vendor
 
 
 class RegisterForm(forms.ModelForm):
@@ -20,3 +20,9 @@ class RegisterForm(forms.ModelForm):
             raise forms.ValidationError(
                 'Password does not match!'
             )
+
+
+class RegisterVendorForm(forms.ModelForm):
+    class Meta:
+        model = Vendor
+        fields = ['vendor_name', 'vendor_license']

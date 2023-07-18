@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, UserProfile
+from .models import User, UserProfile, Vendor
 from django.contrib.auth.admin import UserAdmin
 
 
@@ -12,5 +12,11 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = ()
 
 
+class VendorAdmin(admin.ModelAdmin):
+    list_display = ('user', 'vendor_name', 'is_approved', 'created_at')
+    list_display_links = ('user', 'vendor_name')
+
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(UserProfile)
+admin.site.register(Vendor, VendorAdmin)

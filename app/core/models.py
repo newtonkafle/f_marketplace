@@ -42,11 +42,11 @@ class UserManger(BaseUserManager):
 
 
 class User(AbstractBaseUser):
-    RESTURANT = 1
+    VENDOR = 1
     CUSTOMER = 2
 
     ROLE_CHOICE = (
-        (RESTURANT, 'Restuarnt'),
+        (VENDOR, 'Vendor'),
         (CUSTOMER, 'Customer'),
     )
     first_name = models.CharField(max_length=50)
@@ -104,15 +104,16 @@ class UserProfile(models.Model):
         return self.user.email
 
 
-# @receiver(post_save, sender=User)
-# def create_profile(sender, instance, created, **kwargs):
-#     """create a profile of user using django signal post_save """
-#     try:
-#         profile = UserProfile.objects.get(user=instance)
-#     except UserProfile.DoesNotExist:
-#         UserProfile.objects.create(user=instance)
-#     else:
-#         profile.save()
+class Vendor(models.Model):
+    user = models.OneToOneField(
+        User, related_name='user', on_delete=models.CASCADE)
+    user_profile = models.OneToOneField(
+        UserProfile, related_name='user_profile', on_delete=models.CASCADE)
+    vendor_name = models.CharField(max_length=50)
+    vendor_license = models.ImageField(upload_to='vendor/license')
+    is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now=True)
+    modified_at = models.DateTimeField(auto_now=True)
 
-
-# # post_save.connect(create_profile, sender=User)
+    def __str__(self):
+        return self.vendor_name
