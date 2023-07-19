@@ -1,9 +1,12 @@
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from core.forms import RegisterForm, RegisterVendorForm
 from core.models import User, UserProfile
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
+from .utils import send_verification_email
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
 
 
 def login_excluded():
@@ -19,7 +22,7 @@ def login_excluded():
 
 
 def permission_check(view_name):
-    """ This decorator kicks authenticated users out of a view """
+    """ This decorator kicks irrespective user out of the view """
     def _method_wrapper(view_method):
         def _arguments_wrapper(request, *args, **kwargs):
             role = f'{request.user.get_role_display().lower()}'
@@ -50,6 +53,10 @@ def registerCustomer(request):
             )
             user.role = User.CUSTOMER
             user.save()
+
+            # send verification email
+            send_verification_email(request, user)
+
             messages.success(
                 request, 'Your account has been created successfully!')
             return redirect('registerCustomer')
@@ -89,6 +96,9 @@ def registerVendor(request):
             vendor.user = user
             vendor.user_profile = UserProfile.objects.get(user=user)
             vendor.save()
+
+            # send veification email to verify the account
+            send_verification_email(request, user)
             messages.success(
                 request, 'Your account has been registered successfully ! Please wait for the approval')
 
@@ -109,8 +119,30 @@ def registerVendor(request):
     return render(request, 'accounts/registerVendor.html', context)
 
 
+def activate(request, uidb64, token):
+    """ activate the user by setting is_active status to true. """
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = get_object_or_404(User, pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+        messages.error(request, 'Activation failed, Activation link invalid !')
+    else:
+        if default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            messages.success(request, 'Account activation successful.')
+        else:
+            messages.error(
+                request, 'Activation failed, Activation link expired!')
+
+    finally:
+        return redirect('accountRedirect')
+
+
 @login_excluded()
 def login(request):
+    """ login view for all the user """
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
@@ -128,18 +160,21 @@ def login(request):
 
 
 def account_redirect(request):
+    """ this view will redirect user to their respective view"""
     user = request.user
-    if user.role == 1:
-        return redirect('vendorDashboard')
-    elif user.role == 2:
-        return redirect('customerDashboard')
-    elif user.role is None and user.is_superadmin:
-        return redirect('/admin')
+    if user.id is not None:
+        if user.role == 1:
+            return redirect('vendorDashboard')
+        elif user.role == 2:
+            return redirect('customerDashboard')
+        elif user.role == None and user.is_superadmin:
+            return redirect('/admin')
     return redirect('login')
 
 
 @login_required
 def logout(request):
+    """ view to log out the user"""
     auth.logout(request)
     messages.info(request, 'You are successfully logged out!')
     return redirect('login')
@@ -148,10 +183,12 @@ def logout(request):
 @login_required
 @permission_check('customer')
 def custDashboard(request):
+    """ cumstomer dashboard view"""
     return render(request, 'accounts/custDashboard.html')
 
 
 @login_required
 @permission_check('vendor')
 def vendorDashboard(request):
+    """ vendor dashboard view """
     return render(request, 'accounts/vendorDashboard.html')
