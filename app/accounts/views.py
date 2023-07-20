@@ -55,7 +55,9 @@ def registerCustomer(request):
             user.save()
 
             # send verification email
-            send_verification_email(request, user)
+            send_verification_email(request,
+                                    user,
+                                    'AA')
 
             messages.success(
                 request, 'Your account has been created successfully!')
@@ -98,7 +100,7 @@ def registerVendor(request):
             vendor.save()
 
             # send veification email to verify the account
-            send_verification_email(request, user)
+            send_verification_email(request, user, 'AA')
             messages.success(
                 request, 'Your account has been registered successfully ! Please wait for the approval')
 
@@ -192,3 +194,69 @@ def custDashboard(request):
 def vendorDashboard(request):
     """ vendor dashboard view """
     return render(request, 'accounts/vendorDashboard.html')
+
+
+def forgot_password(request):
+    """ view for handling the forgot password"""
+    if request.method == 'POST':
+        email = request.POST['email']
+
+        if User.objects.filter(email=email).exists():
+            user = User.objects.get(email__exact=email)
+
+            # send reset password email
+            send_verification_email(request,
+                                    user,
+                                    'RP')
+
+            messages.success(
+                request, 'Password reset link sent to your email!')
+            return redirect('login')
+        else:
+            messages.error(request, 'Account does not exists!')
+            return redirect('forgot_password')
+
+    return render(request, 'accounts/forgot_password.html')
+
+
+def reset_password_validate(request, uidb64, token):
+    """ view to validate the request to reset the password"""
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = get_object_or_404(User, pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        messages.error(
+            request, 'Link Error, Password reset link has been modified!')
+        return redirect('accountRedirect')
+    else:
+        if default_token_generator.check_token(user, token):
+            request.session['uid'] = uid
+            messages.success(request, 'Please reset your password')
+            return redirect('reset_password')
+        else:
+            messages.error(
+                request, 'Password reset failed, The link has been expired!')
+            return redirect('accountRedirect')
+
+
+def reset_password(request):
+    """ view to reset the password"""
+    # bugs check and error handling required
+
+    if request.method == 'POST':
+        password = request.POST['password']
+        conf_password = request.POST['confirm_password']
+
+        if password == conf_password:
+            pk = request.session.get('uid')
+            user = User.objects.get(pk=pk)
+            user.set_password(password)
+            user.is_active = True
+            user.save()
+            messages.success(request, 'Password reset successful')
+            return redirect('login')
+        else:
+            messages.error("Password doesn't match")
+            return redirect('reset_password')
+
+    return render(request, 'accounts/reset_password.html')
