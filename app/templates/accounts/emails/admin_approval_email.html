@@ -1,0 +1,10 @@
+{% autoescape off %}
+Hi {{user.first_name}}, 
+{{ is_approved }}
+{% if is_approved %}
+Congratulations! Your request to publish your company on marketplace has been approved. 
+{% else %}
+We're sorry ! Your request to publish your company to marketplace has been rejected please contact support@__.com for further information.
+{% endif %}
+{% endautoescape %}
+

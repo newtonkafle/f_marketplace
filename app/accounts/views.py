@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from core.forms import RegisterForm, RegisterVendorForm
-from core.models import User, UserProfile
+from core.models import User, UserProfile, Vendor
 from django.contrib import messages, auth
 from django.contrib.auth.decorators import login_required
 from .utils import send_verification_email
@@ -193,7 +193,11 @@ def custDashboard(request):
 @permission_check('vendor')
 def vendorDashboard(request):
     """ vendor dashboard view """
-    return render(request, 'accounts/vendorDashboard.html')
+    vendor = Vendor.objects.get(user=request.user)
+    context = {
+        'vendor': vendor,
+    }
+    return render(request, 'accounts/vendorDashboard.html', context=context)
 
 
 def forgot_password(request):

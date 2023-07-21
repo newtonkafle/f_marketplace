@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from accounts.utils import send_notification
 
 
 class UserManger(BaseUserManager):
@@ -100,6 +101,9 @@ class UserProfile(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     modified_at = models.DateTimeField(auto_now=True)
 
+    def full_address(self):
+        return f'{self.address_line_1}, {self.address_line_2} {self.state}, {self.country}, {self.post_code}'
+
     def __str__(self):
         return self.user.email
 
@@ -117,3 +121,17 @@ class Vendor(models.Model):
 
     def __str__(self):
         return self.vendor_name
+
+    def save(self, *args, **kwargs):
+        """ overriding the save function of the django."""
+        if self.pk is not None:
+            db_vendor = Vendor.objects.get(pk=self.pk)
+            if db_vendor.is_approved != self.is_approved:
+                context = {
+                    'user': self.user,
+                    'is_approved': self.is_approved,
+                }
+                print(context['is_approved'])
+                send_notification('VA', context)
+
+        return super(Vendor, self).save(*args, **kwargs)

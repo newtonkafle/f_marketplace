@@ -1,12 +1,9 @@
 {% extends 'base.html' %}
+{% block content %}
 {% load static %}
 
-{% block content %}
-<!-- Main Section Start -->
 <div class="main-section">
-        <!-- Container Start -->
-        {% include 'includes/cover.html' %}
-        <!-- Container End -->
+{% include 'includes/cover.html' %}
     <div class="page-section account-header buyer-logged-in">
         <div class="container">
             <div class="row">
@@ -15,41 +12,7 @@
                 <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
                     <div class="user-dashboard loader-holder">
                         <div class="user-holder">
-                            <h5 class="text-uppercase">Overview</h5>
-                            <div class="row">
-                                <div class="col">
-                                    <div class="card mb-4 rounded-3 shadow-sm ">
-                                      <div class="card-header py-3 bg-success">
-                                        <h4 class="my-0 fw-normal">Total Order</h4>
-                                      </div>
-                                      <div class="card-body">
-                                        <h1 class="card-title pricing-card-title">5567</h1>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div class="col">
-                                    <div class="card mb-4 rounded-3 shadow-sm">
-                                      <div class="card-header py-3 bg-success">
-                                        <h4 class="my-0 fw-normal">Total Revenue</h4>
-                                      </div>
-                                      <div class="card-body">
-                                        <h1 class="card-title pricing-card-title">$5567</h1>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div class="col">
-                                    <div class="card mb-4 rounded-3 shadow-sm">
-                                      <div class="card-header py-3 bg-success">
-                                        <h4 class="my-0 fw-normal">Monthly Revenue</h4>
-                                      </div>
-                                      <div class="card-body">
-                                        <h1 class="card-title pricing-card-title">$567.99<small class="text-body-secondary fw-light">/mo</small></h1>
-                                      </div>
-                                    </div>
-                                  </div>
-                            </div>
-                            <br>
-                            <br>
+                            
                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                 <div class="row">
                                     <div class="element-title has-border right-filters-row">
@@ -125,6 +88,6 @@
     </div>
 </div>
 <!-- Main Section End -->
+
 {% include 'includes/alerts.html' %}
 {% endblock content %}
-
