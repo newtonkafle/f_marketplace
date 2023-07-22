@@ -7,31 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .utils import send_verification_email
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
-
-
-def login_excluded():
-    """ This decorator kicks authenticated users out of a view """
-    def _method_wrapper(view_method):
-        def _arguments_wrapper(request, *args, **kwargs):
-            if request.user.is_authenticated:
-                messages.warning(request, 'You are already logged in!')
-                return redirect('accountRedirect')
-            return view_method(request, *args, **kwargs)
-        return _arguments_wrapper
-    return _method_wrapper
-
-
-def permission_check(view_name):
-    """ This decorator kicks irrespective user out of the view """
-    def _method_wrapper(view_method):
-        def _arguments_wrapper(request, *args, **kwargs):
-            role = f'{request.user.get_role_display().lower()}'
-            if role != view_name:
-                messages.warning(request, 'Permission Denied!')
-                return redirect('accountRedirect')
-            return view_method(request, *args, **kwargs)
-        return _arguments_wrapper
-    return _method_wrapper
+from core.permission_manager import permission_check, login_excluded
 
 
 @login_excluded()

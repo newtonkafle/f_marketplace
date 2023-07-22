@@ -91,8 +91,7 @@ class UserProfile(models.Model):
         upload_to='core/profile_pictures', blank=True, null=True)
     cover_picture = models.ImageField(
         upload_to='core/cover_pictures', blank=True, null=True)
-    address_line_1 = models.CharField(max_length=50, blank=True, null=True)
-    address_line_2 = models.CharField(max_length=50, blank=True, null=True)
+    address = models.CharField(max_length=100, blank=True, null=True)
     country = models.CharField(max_length=20, blank=True, null=True)
     state = models.CharField(max_length=20, blank=True, null=True)
     post_code = models.CharField(max_length=10, blank=True, null=True)
@@ -102,7 +101,7 @@ class UserProfile(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def full_address(self):
-        return f'{self.address_line_1}, {self.address_line_2} {self.state}, {self.country}, {self.post_code}'
+        return f'{self.address}, {self.state}, {self.country}, {self.post_code}'
 
     def __str__(self):
         return self.user.email
