@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# ignoring the media files for dev purpose 
+
 # dockerfile
 docker-compose.yml
 Dockerfile
