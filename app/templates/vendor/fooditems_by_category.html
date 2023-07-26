@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+
+<div class="main-section">
+{% include 'includes/cover.html' %}
+    <div class="page-section account-header buyer-logged-in">
+        <div class="container">
+            <div class="row">
+               {% comment %} load the side bar here {% endcomment %}
+               {% include 'includes/v_sidebar.html' %}
+                <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                    <div class="user-dashboard loader-holder">
+                        <div class="user-holder">
+                            <h5 class="text-uppercase">Build Your Food Menu</h5>
+                            <hr>
+                            <button onclick="history.back()"class="btn btn-secondary btn-sm mb-3"><i class="fa fa-arrow-left" aria-hidden="true"></i> Back</button>
+                            <h6> Category: <span class="text-uppercase text-primary">{{category}}</span> </h6>
+                            <a href="#" class='btn btn-success float-right m-1'><i class="fa fa-plus"></i> Add Food</a>
+                            {% if products %}
+                            <table class="table table-hover table-borderless">
+                                <tbody>
+                                    {% for product in products %}
+                                  <tr>
+                                    <td scope="row">{{forloop.counter}}</td>
+                                    <td class="text-left"><img src="{{product.image.url}}" alt="Food Image" width="30"></td>
+                                    <td class="text-left"><a href=""><p class="mb-0 font-weight-bold">{{product}}</p>
+                                    <small class="text-muted">{{food.description}}</small></a></td>
+                                    <td>
+                                        <a href=""><i class="fa fa-pencil fa-lg" aria-hidden="true"></a></i> &nbsp; 
+                                        <a href=""><i class="text-danger fa fa-eraser fa-lg" aria-hidden="true"></i></a>
+                                    </td>
+                                  </tr>
+                                  {% endfor %}
+                                </tbody>
+                              </table>
+                              {% else %}
+                              <p class="text-center"> Please add food items to the category to show here. </p>
+                              {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Main Section End -->
+
+{% include 'includes/alerts.html' %}
+{% endblock content %}

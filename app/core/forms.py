@@ -1,7 +1,7 @@
 """ includes the djnago form and the validators for the forms """
 import os
 from django import forms
-from core.models import User, Vendor, UserProfile
+from core.models import User, Vendor, UserProfile, Category
 from django.core.exceptions import ValidationError
 
 
@@ -65,3 +65,11 @@ class UserProfileForm(forms.ModelForm):
         for field in self.fields:
             if field == 'latitude' or field == 'longitude':
                 self.fields[field].widget.attrs['readonly'] = 'readonly'
+
+
+# _______menu_builder_form________#
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['category_name', 'description']

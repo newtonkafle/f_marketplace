@@ -41,6 +41,8 @@ class UserManger(BaseUserManager):
 
         return user
 
+# ------ User -----#
+
 
 class User(AbstractBaseUser):
     VENDOR = 1
@@ -106,6 +108,8 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.email
 
+# ------ Vendor --------#
+
 
 class Vendor(models.Model):
     user = models.OneToOneField(
@@ -134,3 +138,47 @@ class Vendor(models.Model):
                 send_notification('VA', context)
 
         return super(Vendor, self).save(*args, **kwargs)
+
+
+# ------- Vendor Menu Models------#
+
+
+# ----- product category model ---#
+class Category(models.Model):
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    category_name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(max_length=300, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'category'
+        verbose_name_plural = 'categories'
+
+    def clean(self):
+        name_words = [word.capitalize()
+                      for word in self.category_name.split(' ')]
+
+        self.category_name = " ".join(name_words)
+        print(self.category_name)
+
+    def __str__(self):
+        return self.category_name
+
+
+# ----- product model ----#
+class Product(models.Model):
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    product_title = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(max_length=300, null=True, blank=True)
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    image = models.ImageField(upload_to='vendor/foodimages')
+    is_available = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.product_title
