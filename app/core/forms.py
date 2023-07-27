@@ -1,7 +1,7 @@
 """ includes the djnago form and the validators for the forms """
 import os
 from django import forms
-from core.models import User, Vendor, UserProfile, Category
+from core.models import User, Vendor, UserProfile, Category, Product
 from django.core.exceptions import ValidationError
 
 
@@ -73,3 +73,10 @@ class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
         fields = ['category_name', 'description']
+
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['category', 'product_title', 'price',
+                  'is_available', 'image', 'description']

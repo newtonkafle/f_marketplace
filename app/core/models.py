@@ -171,7 +171,7 @@ class Category(models.Model):
 class Product(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    product_title = models.CharField(max_length=50)
+    product_title = models.CharField(unique=True, max_length=50)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(max_length=300, null=True, blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
@@ -182,3 +182,10 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_title
+
+    def clean(self):
+        name_words = [word.capitalize()
+                      for word in self.product_title.split(' ')]
+
+        self.product_title = " ".join(name_words)
+        print(self.product_title)

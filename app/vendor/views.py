@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from core.models import Vendor, UserProfile, Category, Product
-from core.forms import RegisterVendorForm, UserProfileForm, CategoryForm
+from core.forms import RegisterVendorForm, UserProfileForm, CategoryForm, ProductForm
 from django.contrib import messages
 from core.permission_manager import permission_check
 from django.contrib.auth.decorators import login_required
@@ -75,6 +75,8 @@ def productsByCategory(request, pk=None):
     return render(request, 'vendor/fooditems_by_category.html', context)
 
 
+@login_required
+@permission_check('vendor')
 def addCategory(request):
     if request.method == "POST":
         form = CategoryForm(request.POST)
@@ -99,6 +101,8 @@ def addCategory(request):
     return render(request, 'vendor/add_category.html', context)
 
 
+@login_required
+@permission_check('vendor')
 def editCategory(request, pk=None):
     category = get_object_or_404(Category, pk=pk)
     if request.method == "POST":
@@ -121,8 +125,70 @@ def editCategory(request, pk=None):
     return render(request, 'vendor/edit_category.html', context)
 
 
+@login_required
+@permission_check('vendor')
 def deleteCategory(request, pk=None):
     category = get_object_or_404(Category, pk=pk)
     category.delete()
     messages.success(request, 'Category Deleted!')
     return redirect('menu_builder')
+
+
+@login_required
+@permission_check('vendor')
+def addProduct(request):
+    """ view to add the product. """
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.vendor = get_vendor(request)
+            product.slug = slugify(form.cleaned_data['product_title'])
+            form.save()
+            messages.success(request, 'Product Added!')
+            return redirect('products_by_category', pk=product.category.pk)
+    else:
+        form = ProductForm()
+        form.fields['category'].queryset = Category.objects.filter(
+            vendor=get_vendor(request))
+    context = {
+        'form': form,
+    }
+    return render(request, 'vendor/add_product.html', context)
+
+
+@login_required
+@permission_check('vendor')
+def editProduct(request, product_id=None):
+    """ view to edit the specific product. """
+    product = get_object_or_404(Product, pk=product_id)
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            product = form.save(commit=False)
+            product.vendor = get_vendor(request)
+            product.slug = slugify(form.cleaned_data['product_title'])
+            form.save()
+            messages.success(request, 'Product Updated!')
+            return redirect('products_by_category', pk=product.category.pk)
+    else:
+        form = ProductForm(instance=product)
+        form.fields['category'].queryset = Category.objects.filter(
+            vendor=get_vendor(request))
+
+    context = {
+        'form': form,
+        'product': product
+    }
+
+    return render(request, 'vendor/edit_product.html', context)
+
+
+@login_required
+@permission_check('vendor')
+def deleteProduct(request, product_id=None):
+    """ view to delete the picture """
+    product = get_object_or_404(Product, pk=product_id)
+    product.delete()
+    messages.success(request, 'Product Deleted!')
+    return redirect('products_by_category', pk=product.category.pk)
