@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'core',
     'accounts',
     'vendor',
+    'marketplace',
 
 
 ]

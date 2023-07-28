@@ -117,6 +117,7 @@ class Vendor(models.Model):
     user_profile = models.OneToOneField(
         UserProfile, related_name='user_profile', on_delete=models.CASCADE)
     vendor_name = models.CharField(max_length=50)
+    vendor_slug = models.SlugField(max_length=100, unique=True)
     vendor_license = models.ImageField(upload_to='vendor/license')
     is_approved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now=True)
@@ -168,9 +169,11 @@ class Category(models.Model):
 
 
 # ----- product model ----#
+
 class Product(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, related_name='products')
     product_title = models.CharField(unique=True, max_length=50)
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(max_length=300, null=True, blank=True)
@@ -189,3 +192,16 @@ class Product(models.Model):
 
         self.product_title = " ".join(name_words)
         print(self.product_title)
+
+
+# --------- cart model -------#
+
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.user

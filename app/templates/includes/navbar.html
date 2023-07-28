@@ -1,7 +1,7 @@
 {% load static %}
 <header id="header">
   <div class="main-header">
-    <div class="container">
+    <div class="container-fluid">
       <div class="row">
         <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
           <div class="logo">
@@ -51,12 +51,18 @@
           </div>
           {% else %}
           <div class="login-option">
+            <a href="">
+              <i class="mt-4 btn btn-danger btn-sm login-popup fa fa-shopping-basket fa-6"></i>
+              <span class="badge badge-primary"id="cart-counter">0</span>
+
+            </a>
+            <a href="{% url 'marketplace' %}" class="btn btn-outline-danger btn-sm login-popup"> MarketPlace </a>
             <a
-              class="cs-color cs-popup-joinus-btn login-popup"
+              class=" btn btn-sm btn-outline-danger login-popup"
               href="{% url 'accountRedirect' %}"
               >My Account</a
             >
-            <a class="get-start-btn" href="{% url 'logout' %}">
+            <a class="btn btn-danger btn-sm login-popup text-light" href="{% url 'logout' %}">
               Log Out
             </a>
           </div>

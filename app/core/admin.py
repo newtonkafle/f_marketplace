@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, UserProfile, Vendor, Category, Product
+from .models import User, UserProfile, Vendor, Category, Product, Cart
 from django.contrib.auth.admin import UserAdmin
 
 
@@ -33,8 +33,13 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ('is_available',)
 
 
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'quantity', 'modified_at')
+
+
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(UserProfile)
 admin.site.register(Vendor, VendorAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
+admin.site.register(Cart, CartAdmin)

@@ -1,3 +1,26 @@
+
+$(document).ready(function(){
+    $(".add-to-cart").on('click', function(e){
+        e.preventDefault();
+        product_id = $(this).attr('data-id')
+        url = $(this).attr('data-url')
+
+        data = {
+            product_id: product_id,
+        }
+
+        $.ajax({
+            type: 'GET',
+            url: url, 
+            data: data,
+            success: function(res){
+            }
+        })
+    })
+});
+
+
+
 let autocomplete;
 
 function initAutoComplete(){
@@ -63,6 +86,8 @@ function fillFormFileds(addressComponents){
         }
     })
 }
+
+
 
 
 

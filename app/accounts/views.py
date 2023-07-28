@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .utils import send_verification_email
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
+from django.template.defaultfilters import slugify
 from core.permission_manager import permission_check, login_excluded
 
 
@@ -72,6 +73,8 @@ def registerVendor(request):
             # creating the vendor
             vendor = v_form.save(commit=False)
             vendor.user = user
+            vendor.vendor_slug = slugify(
+                v_form.cleaned_data['vendor_name']) + '-' + str(user.id)
             vendor.user_profile = UserProfile.objects.get(user=user)
             vendor.save()
 
