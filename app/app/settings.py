@@ -77,6 +77,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.get_vendor',
                 'core.context_processors.get_google_api',
+                'core.context_processors.get_cart_counter',
+                'core.context_processors.get_cart_amounts',
             ],
         },
     },

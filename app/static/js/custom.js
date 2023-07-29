@@ -1,23 +1,169 @@
 
 $(document).ready(function(){
+
+      // place the cart item quantity on load
+
+      $('.item-qty').each(function(){
+        let i_id = $(this).attr('id')
+        let qty = $(this).attr('data-qty')
+
+        $('#'+i_id).html(qty)
+    })
+
     $(".add-to-cart").on('click', function(e){
         e.preventDefault();
         product_id = $(this).attr('data-id')
         url = $(this).attr('data-url')
 
-        data = {
-            product_id: product_id,
-        }
-
         $.ajax({
             type: 'GET',
             url: url, 
-            data: data,
             success: function(res){
+                console.log(res)
+            if(res.status == 'login-required'){
+                swal({
+                    'title':res.status, 
+                    'text': res.message,
+                     'icon':'info',
+                }).then(() => window.location = '/accounts/login/')
+            }
+            if(res.status == 'failed'){
+                swal({
+                    'title':res.status,
+                    'text':res.message,
+                    'icon':'error',
+                })
+            }
+            $('#cart-counter').html(res.cart_counter['cart_count'])
+            $('#qty-'+product_id).html(res.qty)
+
+                // subtotal, tax and grandtotal
+                updateCartAmounts(
+                    subtotal=res.amounts['subtotal'],
+                    gst=res.amounts['gst'],
+                    total=res.amounts['total']
+                )
             }
         })
     })
+
+    // decrease cart
+    $(".decrease-cart").on('click', function(e){
+        e.preventDefault();
+        product_id = $(this).attr('data-id')
+        cart_id = $(this).attr('cart-id')
+        url = $(this).attr('data-url')
+        $.ajax({
+            type: 'GET',
+            url: url, 
+            success: function(res){
+
+            if(res.status == 'login-required'){
+                    swal({
+                        'title':res.status,
+                        'text': res.message,
+                        'icon': 'info'
+                    }).then(() => window.location = '/accounts/login/')
+                }
+            else if(res.status == 'failed'){
+                swal({
+                    'title': res.status,
+                    'text': res.message,
+                    'icon': 'error'
+                })
+            } else{
+                $('#cart-counter').html(res.cart_counter['cart_count'])
+                $('#qty-'+product_id).html(res.qty)
+
+                updateCartAmounts(
+                    subtotal=res.amounts['subtotal'],
+                    gst=res.amounts['gst'],
+                    total=res.amounts['total']
+                )
+                if(checkCart){
+                    removeCartItem(res.qty, cart_id)
+                    checkCartEmpty()
+                }  
+
+            }
+            
+            }
+        })
+    })
+    // delete cart item
+    $(".delete-cart").on('click', function(e){
+        e.preventDefault();
+        cart_id = $(this).attr('data-id')
+        url = $(this).attr('data-url')
+        $.ajax({
+            type: 'GET',
+            url: url, 
+            success: function(res){
+            if(res.status == 'failed'){
+                swal({
+                    'title': res.status,
+                    'text': res.message,
+                    'icon': 'error',
+                })
+            } else {
+                $('#cart-counter').html(res.cart_counter['cart_count'])
+
+                swal({
+                    'title': res.status,
+                    'text': res.message,
+                    'icon': 'success'
+                }).then(() => removeCartItem(0, cart_id))
+                updateCartAmounts(
+                    subtotal=res.amounts['subtotal'],
+                    gst=res.amounts['gst'],
+                    total=res.amounts['total']
+                )
+                checkCartEmpty()
+            }
+            }
+         })
+        })
+
+
+    // delete the cart from fronted
+    function removeCartItem(cart_item_qty, cart_id){
+            if(cart_item_qty <= 0){
+                document.getElementById("cart-item-" + cart_id).remove()
+            }
+        
+    
+        
+    }
+    function checkCartEmpty(){
+        let cart_counter = document.getElementById('cart-counter').innerHTML
+        if(cart_counter == 0){
+            const empty_cart = document.getElementById('empty-cart')
+            empty_cart.classList.remove('d-none')
+        
+    }
+    }
+
+    //updating cart amount
+    function updateCartAmounts(subtotal, gst, total){
+        if(checkCart){
+            $('#subtotal').html(subtotal)
+            $('#gst').html(gst)
+            $('#total').html(total)
+        }
+       
+    }
+
+    const checkCart = function(){
+        if(window.location.pathname == '/marketplace/cart/'){
+            return true
+        }
+        return false
+    }
+
+  
+
 });
+
 
 
 

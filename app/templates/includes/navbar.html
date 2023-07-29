@@ -51,10 +51,9 @@
           </div>
           {% else %}
           <div class="login-option">
-            <a href="">
+            <a href="{% url 'cart' %}">
               <i class="mt-4 btn btn-danger btn-sm login-popup fa fa-shopping-basket fa-6"></i>
-              <span class="badge badge-primary"id="cart-counter">0</span>
-
+              <span class="badge badge-primary"id="cart-counter">{{cart_count}}</span>
             </a>
             <a href="{% url 'marketplace' %}" class="btn btn-outline-danger btn-sm login-popup"> MarketPlace </a>
             <a
